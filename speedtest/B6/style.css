@@ -1,0 +1,26 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+}
+
+#triangle {
+    width: 0;
+    height: 0;
+    border-right: 40vh solid transparent;
+    border-left: 40vh solid transparent;
+    border-bottom: 80vh solid blue;
+    animation: square 3s infinite;
+}
+
+@keyframes square {
+    30%, 70% {
+        width: 80vh;
+        height: 80vh;
+        background-color: yellow;
+        border: none;
+    }
+}
