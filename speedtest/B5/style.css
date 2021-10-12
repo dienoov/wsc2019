@@ -1,0 +1,22 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+}
+
+#square {
+    background-color: yellow;
+    width: 75vh;
+    height: 75vh;
+    animation: circle 3s infinite;
+}
+
+@keyframes circle {
+    30%, 70% {
+        background-color: red;
+        border-radius: 50%;
+    }
+}
