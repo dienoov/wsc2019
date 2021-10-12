@@ -1,0 +1,73 @@
+#container {
+    display: grid;
+    grid-template-areas: "site-title site-title nav-1 nav-2 nav-2 nav-3"
+        "post-title post-title post-title post-title side-bar side-bar"
+        "post-meta main-content main-content main-content side-bar side-bar"
+        "post-meta main-content main-content main-content ads ads"
+        "post-meta main-content-image main-content-image main-content-image ads ads"
+        "post-meta main-content-image main-content-image main-content-image other-stuffs other-stuffs"
+        "footer footer footer footer footer footer";
+    grid-template-columns: 1fr 2fr 1fr .8fr .2fr 1fr;
+    grid-template-rows: 50px 50px 50px 50px 50px 100px 50px;
+    grid-gap: 3px;
+}
+
+#site-title {
+    grid-area: site-title;
+    background-color: gold;
+}
+
+#nav-1 {
+    grid-area: nav-1;
+    background-color: pink;
+}
+
+#nav-2 {
+    grid-area: nav-2;
+    background-color: pink;
+}
+
+#nav-3 {
+    grid-area: nav-3;
+    background-color: pink;
+}
+
+#post-title {
+    grid-area: post-title;
+    background-color: lightblue;
+}
+
+#post-meta {
+    grid-area: post-meta;
+    background-color: lightgreen;
+}
+
+#main-content {
+    grid-area: main-content;
+    background-color: lightgray;
+}
+
+#main-content-image {
+    grid-area: main-content-image;
+    background-color: yellow;
+}
+
+#side-bar {
+    grid-area: side-bar;
+    background-color: orange;
+}
+
+#ads {
+    grid-area: ads;
+    background-color: green;
+}
+
+#other-stuffs {
+    grid-area: other-stuffs;
+    background-color: fuchsia;
+}
+
+#footer {
+    grid-area: footer;
+    background-color: rosybrown;
+}
