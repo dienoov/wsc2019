@@ -1,0 +1,108 @@
+body {
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+}
+
+.wrap {
+    position: relative;
+}
+
+.track {
+    display: flex;
+}
+
+.o {
+    width: 25vh;
+    height: 25vh;
+    background-color: #111;
+    border-radius: 50%;
+    position: relative;
+}
+
+.o::after {
+    content: "";
+    width: 15vh;
+    height: 15vh;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    background-color: white;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+}
+
+.o:first-child {
+    margin-right: -2.5vh;
+}
+
+.o:last-child {
+    margin-left: -2.5vh;
+}
+
+.car {
+    position: relative;
+    width: 25vh;
+    height: 25vh;
+    border-radius: 50%;
+}
+
+.car.left {
+    top: -25vh;
+    left: 0;
+    right: auto;
+    animation: left 2s infinite linear;
+}
+
+.car.right {
+    top: -50vh;
+    left: auto;
+    right: -20vh;
+    animation: right 2s infinite linear;
+}
+
+.car::after {
+    content: "";
+    position: absolute;
+    width: 2vh;
+    height: 2vh;
+    background-color: red;
+    top: 50%;
+    left: 2.5vh;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+}
+
+@keyframes left {
+    from {
+        transform: rotate(0);
+    }
+    25%, 75% {
+        opacity: 1;
+        transform: rotate(180deg);
+    }
+    26%, 74% {
+        opacity: 0;
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes right {
+    from, 24%, 76%, to {
+        opacity: 0;
+    }
+    25%, 75% {
+        opacity: 1;
+    }
+    25% {
+        transform: rotate(0);
+    }
+    75% {
+        transform: rotate(-360deg);
+    }
+}

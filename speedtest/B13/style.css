@@ -1,0 +1,15 @@
+body {
+    animation: gradient 6s infinite ease-in-out;
+    animation-fill-mode: forwards;
+}
+
+@keyframes gradient {
+    from, to {
+        background-image: linear-gradient(to right, pink, salmon, coral);
+        background-size: 300% 100%;
+        background-position: left;
+    }
+    50% {
+        background-position: right;
+    }
+}
