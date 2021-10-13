@@ -40,6 +40,12 @@ body {
     padding: 10px;
 }
 
+@media (max-width: 576px) {
+    .two-column > * {
+        flex-basis: 100%;
+    }
+}
+
 .radio .form__label {
     position: relative;
     z-index: 4;
@@ -52,6 +58,14 @@ body {
 .radio .form__fieldwrap--radio:last-child .form__label {
     background-color: lightgray;
     color: black;
+}
+
+@media (max-width: 576px) {
+    .radio .form__label {
+        width: 100%;
+        display: block;
+        text-align: center;
+    }
 }
 
 .radio .form__label input {
@@ -67,7 +81,14 @@ fieldset + fieldset {
     margin-top: 40px;
 }
 
-.form__fieldwrap.url {
+.form__fieldwrap.url, .form__fieldwrap--textarea, .form__fieldwrap--submit {
     margin-top: 20px;
     margin-bottom: 20px;
+}
+
+.button--submit {
+    width: 100%;
+    background-color: lightgray;
+    border: none;
+    padding: 15px 20px;
 }
