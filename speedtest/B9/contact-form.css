@@ -92,3 +92,7 @@ fieldset + fieldset {
     border: none;
     padding: 15px 20px;
 }
+
+fieldset {
+    border-style: dotted;
+}
