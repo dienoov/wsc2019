@@ -21,10 +21,7 @@ body {
     font-size: 1em;
     line-height: 1.5em;
     border-radius: 0;
-    padding-top: .7em;
-    padding-bottom: .7em;
-    padding-left: 20px;
-    padding-right: 20px;
+    padding: .7em 20px;
     font-family: inherit;
     outline: none;
 }
@@ -41,4 +38,27 @@ body {
 .two-column > * {
     flex-basis: 50%;
     padding: 10px;
+}
+
+.radio .form__label {
+    position: relative;
+    z-index: 4;
+    padding: 15px 20px;
+    border-radius: 4px;
+    background-color: black;
+    color: white;
+}
+
+.radio .form__fieldwrap--radio:last-child .form__label {
+    background-color: lightgray;
+    color: black;
+}
+
+.radio .form__label input {
+    position: absolute;
+    opacity: 0;
+}
+
+.radio .form__fieldwrap--radio {
+    margin-bottom: 15px;
 }
