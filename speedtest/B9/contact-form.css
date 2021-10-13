@@ -62,3 +62,12 @@ body {
 .radio .form__fieldwrap--radio {
     margin-bottom: 15px;
 }
+
+fieldset + fieldset {
+    margin-top: 40px;
+}
+
+.form__fieldwrap.url {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
