@@ -1,3 +1,7 @@
+* {
+    box-sizing: border-box;
+}
+
 body {
     margin: 0;
     display: flex;
@@ -7,8 +11,43 @@ body {
     height: 100vh;
 }
 
+form {
+    /*display: flex;*/
+    /*align-items: center;*/
+    /*justify-content: center;*/
+    /*flex-direction: column;*/
+    width: 400px;
+    height: 400px;
+    padding: 160px;
+    position: relative;
+    color: white;
+    /*flex-wrap: wrap;*/
+}
+
+form > * {
+    /*flex-basis: 50%;*/
+}
+
 .rect {
     width: 400px;
     height: 400px;
     background-color: black;
+    color: white;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    transition: border-radius .3s ease-out, box-shadow .3s ease-out;
+}
+
+label {
+    width: 80px;
+}
+
+#radius:checked ~ .rect  {
+    border-radius: 50%;
+}
+
+#shadow:checked ~ .rect {
+    box-shadow: 0 0 20px 2px black;
 }
