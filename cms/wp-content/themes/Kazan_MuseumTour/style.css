@@ -1,0 +1,329 @@
+/*
+Theme Name: Kazan_MuseumTour
+Template: blankslate
+*/
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+img {
+    display: block;
+}
+
+ol, ul {
+    list-style: none;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+@font-face {
+    font-family: "Founders Grotesk";
+    src: url("fonts/test-founders-grotesk-regular.woff2");
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: "Ogg";
+    src: url("fonts/Ogg-Bold.otf");
+    font-weight: bold;
+}
+
+body {
+    font-family: "Founders Grotesk", sans-serif;
+    background-color: floralwhite;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: "Ogg", serif;
+}
+
+.admin-bar #header {
+    top: 32px;
+}
+
+#header {
+    padding-right: 20px;
+    padding-left: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: floralwhite;
+    border-bottom: 2px solid black;
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
+
+#site-title {
+    font-size: 24px;
+    font-family: "Ogg", serif;
+}
+
+#menu > div > ul {
+    display: flex;
+}
+
+#menu > div > ul > li {
+    position: relative;
+}
+
+#menu > div > ul > li > a {
+    padding: 30px;
+    display: block;
+    transition: background-color .3s ease-out;
+}
+
+#menu > div > ul > li > ul {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 250px;
+    background-color: floralwhite;
+    visibility: hidden;
+    transition: visibility .3s ease-out;
+    border: 2px solid black;
+}
+
+#menu > div > ul > li:hover > ul {
+    visibility: visible;
+}
+
+#menu > div > ul > li > ul > li > a {
+    display: block;
+    padding: 20px;
+    transition: background-color .3s ease-out;
+    color: black;
+}
+
+#menu > div > ul > li a:hover, #menu > div > ul > li > ul > li a:hover {
+    background-color: black;
+    color: floralwhite;
+    cursor: pointer;
+}
+
+@media (max-width: 576px) {
+    #header {
+        flex-direction: column;
+    }
+
+    #branding {
+        padding: 10px 5px 5px;
+    }
+
+    .admin-bar #header {
+        top: 0;
+    }
+
+    #menu > div > ul > li > a {
+        padding: 10px 20px;
+    }
+}
+
+#hero {
+    background-image: url("images/hero.jpg");
+    background-size: cover;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#hero .title {
+    background-color: floralwhite;
+    padding: 40px;
+    width: 600px;
+    text-align: center;
+    max-width: 90%;
+    border: 2px solid black;
+}
+
+#hero .title h1 {
+    font-size: 72px;
+}
+
+@media (max-width: 576px) {
+    #hero .title {
+        padding: 20px;
+    }
+
+    #hero .title h1 {
+        font-size: 48px;
+    }
+}
+
+.container {
+    width: 100%;
+    max-width: 1140px;
+    margin-right: auto;
+    margin-left: auto;
+    padding-right: 20px;
+    padding-left: 20px;
+}
+
+.container .title {
+    padding-top: 120px;
+    padding-bottom: 20px;
+    text-align: center;
+    font-size: 48px;
+}
+
+.card {
+    display: flex;
+    border: 2px solid black;
+    align-items: center;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+.card > * {
+    flex-basis: 0;
+    flex-grow: 1;
+}
+
+.card .content {
+    padding: 30px;
+}
+
+.card .content header {
+    font-size: 24px;
+}
+
+.card .content p {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+}
+
+.card img {
+    width: 100%;
+    height: auto;
+    border-left: 2px solid black;
+}
+
+@media (max-width: 576px) {
+    .card {
+        flex-direction: column-reverse;
+    }
+}
+
+.form .input {
+    margin-bottom: 20px;
+}
+
+.form .input input, .form .input textarea {
+    width: 100%;
+    font-family: "Founders Grotesk", sans-serif;
+    font-size: 100%;
+    border: 2px solid black;
+    padding: 10px;
+    background-color: transparent;
+}
+
+.form .input input:focus, .form .input textarea:focus {
+    outline: none;
+}
+
+form .input input[type=submit] {
+    background-color: black;
+    color: floralwhite;
+    cursor: pointer;
+}
+
+#footer {
+    margin-top: 120px;
+}
+
+#footer .container {
+    border-top: 2px solid black;
+    padding-top: 80px;
+    padding-bottom: 80px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#footer #social {
+    filter: grayscale(1);
+}
+
+.selected {
+    padding-top: 120px;
+    padding-bottom: 60px;
+    background-size: cover;
+}
+
+.selected .container {
+    background-color: floralwhite;
+    border: 2px solid black;
+    padding: 0 50px 80px;
+}
+
+.selected .title {
+    padding-top: 80px;
+}
+
+@media (max-width: 576px) {
+    .selected .container {
+        padding: 0 20px 80px;
+    }
+
+    .selected h2 {
+        font-size: 36px;
+    }
+}
+
+#banner img {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+}
+
+.selected, #hero, #banner {
+    border-bottom: 2px solid black;
+}
+
+#loading {
+    font-size: 72px;
+    position: fixed;
+    top: -100vh;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: floralwhite;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: "Ogg", serif;
+    transition: top .5s ease-out;
+}
+
+#loading.show {
+    top: 0;
+}
+
+#loading.show::after {
+    content: "";
+    animation: loading 3s infinite;
+}
+
+@keyframes loading {
+    from, to {
+        content: "";
+    }
+    25% {
+        content: ".";
+    }
+    50% {
+        content: "..";
+    }
+    75% {
+        content: "...";
+    }
+}

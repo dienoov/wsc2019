@@ -12,13 +12,16 @@ class AIOWPSecurity_User_Login
     var $key_login_msg;
     function __construct()
     {
+        global $aio_wp_security;
         $this->key_login_msg = 'aiowps_login_msg_id';
         // As a first authentication step, check if user's IP is locked.
         add_filter('authenticate', array($this, 'block_ip_if_locked'), 1, 1);
         // Check whether user needs to be manually approved after default WordPress authenticate hooks (with priority 20).
         add_filter('authenticate', array($this, 'check_manual_registration_approval'), 30, 1);
         // Check login captcha
-        add_filter('authenticate', array($this, 'check_captcha'), 20, 1);
+        if($aio_wp_security->configs->get_value('aiowps_enable_login_captcha')) {
+            add_filter('authenticate', array($this, 'check_captcha'), 20, 1);
+        }
         // As a last authentication step, perform post authentication steps
         add_filter('authenticate', array($this, 'post_authenticate'), 100, 3);
         add_action('aiowps_force_logout_check', array($this, 'aiowps_force_logout_action_handler'));
@@ -54,7 +57,7 @@ class AIOWPSecurity_User_Login
             return $user;
 	}
     }
-    
+
     /**
      * Check login captcha (if enabled).
      * @global AIO_WP_Security $aio_wp_security
@@ -68,12 +71,12 @@ class AIOWPSecurity_User_Login
             // Authentication has failed already at some earlier step.
             return $user;
         }
-        
+
         if ( ! (isset($_POST['log']) && isset($_POST['pwd'])) ) {
             // XML-RPC authentication (not via wp-login.php), nothing to do here.
             return $user;
         }
-        
+
         if ( $aio_wp_security->configs->get_value('aiowps_enable_login_captcha') != '1' ) {
             // Captcha not enabled, nothing to do here.
             return $user;
@@ -89,8 +92,6 @@ class AIOWPSecurity_User_Login
      * Check, whether $user needs to be manually approved by site admin yet.
      * @global AIO_WP_Security $aio_wp_security
      * @param WP_Error|WP_User $user
-     * @param string $username
-     * @param string $password
      * @return WP_Error|WP_User
      */
     function check_manual_registration_approval($user)
@@ -148,7 +149,7 @@ class AIOWPSecurity_User_Login
                 $whitelisted_ips = $aio_wp_security->configs->get_value('aiowps_lockdown_allowed_ip_addresses');
                 $is_whitelisted = AIOWPSecurity_Utility_IP::is_ip_whitelisted($ip, $whitelisted_ips);
             }
-            
+
             if($is_whitelisted === false){
                 // Too many failed logins from user's IP?
                 $login_attempts_permitted = absint($aio_wp_security->configs->get_value('aiowps_max_login_attempts'));
@@ -170,7 +171,7 @@ class AIOWPSecurity_User_Login
                 }
             }
         }
-        
+
         if ( $aio_wp_security->configs->get_value('aiowps_set_generic_login_msg') == '1' )
         {
             // Return generic error message if configured
@@ -206,9 +207,9 @@ class AIOWPSecurity_User_Login
         $now = current_time( 'mysql' );
         $ip = AIOWPSecurity_Utility_IP::get_user_ip_address(); //Get the IP address of user
         if(empty($ip)) return false;
-        $login_failures = $wpdb->get_var("SELECT COUNT(ID) FROM $failed_logins_table " . 
+        $login_failures = $wpdb->get_var("SELECT COUNT(ID) FROM $failed_logins_table " .
                                 "WHERE failed_login_date + INTERVAL " .
-                                $login_retry_interval . " MINUTE > '" . esc_sql($now) . "' AND " . 
+                                esc_sql($login_retry_interval) . " MINUTE > '" . esc_sql($now) . "' AND " .
                                 "login_attempt_ip = '" . esc_sql($ip) . "'");
         return $login_failures;
     }
@@ -221,7 +222,7 @@ class AIOWPSecurity_User_Login
     {
         global $wpdb, $aio_wp_security;
         $login_lockdown_table = AIOWPSEC_TBL_LOGIN_LOCKDOWN;
-        $lockout_time_length = $aio_wp_security->configs->get_value('aiowps_lockout_time_length');
+        $lock_minutes = $aio_wp_security->configs->get_value('aiowps_lockout_time_length');
         $ip = AIOWPSecurity_Utility_IP::get_user_ip_address(); //Get the IP address of user
         if(empty($ip)) return;
         $ip_range = AIOWPSecurity_Utility_IP::get_sanitized_ip_range($ip); //Get the IP range of the current user
@@ -236,15 +237,17 @@ class AIOWPSecurity_User_Login
             $user_id = 0;
         }
         $ip_range_str = esc_sql($ip_range).'.*';
-        
+
         $lock_time = current_time( 'mysql' );
-        $lock_minutes = $lockout_time_length;
-        $newtimestamp = strtotime($lock_time.' + '.$lock_minutes.' minute');
-        $release_time = date('Y-m-d H:i:s', $newtimestamp);
+        $date = new DateTime($lock_time);
+        $add_interval = 'PT'.absint($lock_minutes).'M';
+        $date->add(new DateInterval($add_interval));
+        $release_time = $date->format('Y-m-d H:i:s');
+
         $data = array('user_id' => $user_id, 'user_login' => $username, 'lockdown_date' => $lock_time, 'release_date' => $release_time, 'failed_login_IP' => $ip, 'lock_reason' => $lock_reason);
         $format = array('%d', '%s', '%s', '%s', '%s', '%s');
         $result = $wpdb->insert($login_lockdown_table, $data, $format);
-        
+
         if ($result === FALSE)
         {
             $aio_wp_security->debug_logger->log_debug("Error inserting record into ".$login_lockdown_table,4);//Log the highly unlikely event of DB error
@@ -310,10 +313,10 @@ class AIOWPSecurity_User_Login
             }
         }
     }
-    
+
     /**
      * Generates and returns an unlock request link which will be used to send to the user.
-     * 
+     *
      * @global type $wpdb
      * @global AIO_WP_Security $aio_wp_security
      * @param type $ip_range
@@ -326,8 +329,7 @@ class AIOWPSecurity_User_Login
         $unlock_link = '';
         $lockdown_table_name = AIOWPSEC_TBL_LOGIN_LOCKDOWN;
         $secret_rand_key = (md5(uniqid(rand(), true)));
-        $sql = $wpdb->prepare("UPDATE $lockdown_table_name SET unlock_key = '$secret_rand_key' WHERE release_date > now() AND failed_login_ip LIKE %s","%".esc_sql($ip_range)."%");
-        $res = $wpdb->query($sql);
+        $res = $wpdb->query( $wpdb->prepare("UPDATE $lockdown_table_name SET unlock_key = '$secret_rand_key' WHERE release_date > now() AND failed_login_ip LIKE %s","%".esc_sql($ip_range)."%") );
         if($res == NULL){
             $aio_wp_security->debug_logger->log_debug("No locked user found with IP range ".$ip_range,4);
             return false;
@@ -356,7 +358,7 @@ class AIOWPSecurity_User_Login
     {
         global $wpdb, $aio_wp_security;
         $lockdown_table_name = AIOWPSEC_TBL_LOGIN_LOCKDOWN;
-        
+
         $unlock_command = $wpdb->prepare( "UPDATE ".$lockdown_table_name." SET release_date = now() WHERE unlock_key = %s", $unlock_key );
         $result = $wpdb->query($unlock_command);
         if($result === false)
@@ -390,14 +392,14 @@ class AIOWPSecurity_User_Login
                 }else{
                     $login_url = $home_url.$aio_wp_security->configs->get_value('aiowps_login_page_slug');
                 }
-                
+
                 AIOWPSecurity_Utility::redirect_to_url($login_url);
             }else{
                 AIOWPSecurity_Utility::redirect_to_url(wp_login_url());
             }
         }
     }
-    
+
     /*
      * This function sends an unlock request email to a locked out user
      */
@@ -418,7 +420,7 @@ class AIOWPSecurity_User_Login
             $aio_wp_security->debug_logger->log_debug("Unlock Request Notification email failed to send to " . $email, 4);
         }
     }
-    
+
     /*
      * This function will check the settings and log the user after the configured time period
      */
@@ -441,29 +443,30 @@ class AIOWPSecurity_User_Login
                 {
                     $aio_wp_security->debug_logger->log_debug("Force Logout - This user logged in more than (".$logout_time_interval_value.") minutes ago. Doing a force log out for the user with username: ".$current_user->user_login);
                     $this->wp_logout_action_handler(); //this will register the logout time/date in the logout_date column
-                    
+
                     $curr_page_url = AIOWPSecurity_Utility::get_current_page_url();
                     $after_logout_payload = array('redirect_to'=>$curr_page_url, 'msg'=>$this->key_login_msg.'=session_expired');
                     //Save some of the logout redirect data to a transient
                     AIOWPSecurity_Utility::is_multisite_install() ? set_site_transient('aiowps_logout_payload', $after_logout_payload, 30 * 60) : set_transient('aiowps_logout_payload', $after_logout_payload, 30 * 60);
                     $logout_url = AIOWPSEC_WP_URL.'?aiowpsec_do_log_out=1';
                     $logout_url = AIOWPSecurity_Utility::add_query_data_to_url($logout_url, 'al_additional_data', '1');
-                    AIOWPSecurity_Utility::redirect_to_url($logout_url);
+                    $logout_url_with_nonce = html_entity_decode(wp_nonce_url($logout_url, 'aio_logout'));
+                    AIOWPSecurity_Utility::redirect_to_url($logout_url_with_nonce);
                 }
             }
         }
     }
-    
+
     function get_wp_user_last_login_time($user_id)
     {
         $last_login = get_user_meta($user_id, 'last_login_time', true);
         return $last_login;
     }
-    static function wp_login_action_handler($user_login, $user='') 
+    static function wp_login_action_handler($user_login, $user='')
     {
         global $wpdb, $aio_wp_security;
         $login_activity_table = AIOWPSEC_TBL_USER_LOGIN_ACTIVITY;
-        
+
         if ($user == ''){
             //Try and get user object
             $user = get_user_by('login', $user_login); //This should return WP_User obj
@@ -475,54 +478,131 @@ class AIOWPSecurity_User_Login
         $login_date_time = current_time( 'mysql' );
         update_user_meta($user->ID, 'last_login_time', $login_date_time); //store last login time in meta table
         $curr_ip_address = AIOWPSecurity_Utility_IP::get_user_ip_address();
-        $insert = "INSERT INTO " . $login_activity_table . " (user_id, user_login, login_date, login_ip) " .
-                        "VALUES ('" . $user->ID . "', '" . $user_login . "', '" . $login_date_time . "', '" . $curr_ip_address . "')";
-        $result = $wpdb->query($insert);
+        $data = array('user_id' => $user->ID, 'user_login' => $user_login, 'login_date' => $login_date_time, 'login_ip' => $curr_ip_address);
+        $format = array('%d', '%s', '%s', '%s');
+        $result = $wpdb->insert($login_activity_table, $data, $format);
         if ($result === FALSE)
         {
             $aio_wp_security->debug_logger->log_debug("Error inserting record into ".$login_activity_table,4);//Log the highly unlikely event of DB error
         }
-        
+
     }
     /**
      * The handler for logout events, ie, uses the WP "clear_auth_cookies" action.
-     
+
      * Modifies the login activity record for the current user by registering the logout time/date in the logout_date column.
      * (NOTE: Because of the way we are doing a force logout, the "clear_auth_cookies" hook does not fire.
-     * upon auto logout. The current workaround is to call this function directly from the aiowps_force_logout_action_handler() when 
-     * an auto logout occurs due to the "force logout" feature). 
+     * upon auto logout. The current workaround is to call this function directly from the aiowps_force_logout_action_handler() when
+     * an auto logout occurs due to the "force logout" feature).
      *
      */
-    function wp_logout_action_handler() 
+    function wp_logout_action_handler()
     {
         global $wpdb, $aio_wp_security;
         $current_user = wp_get_current_user();
         $ip_addr = AIOWPSecurity_Utility_IP::get_user_ip_address();
         $user_id = $current_user->ID;
         //Clean up transients table
-        $this->update_user_online_transient($user_id, $ip_addr);
+        $this->cleanup_users_online_transient($user_id, $ip_addr);
         $login_activity_table = AIOWPSEC_TBL_USER_LOGIN_ACTIVITY;
         $logout_date_time = current_time( 'mysql' );
         $data = array('logout_date' => $logout_date_time);
         $where = array('user_id' => $user_id,
                         'login_ip' => $ip_addr,
-                        'logout_date' => '0000-00-00 00:00:00');
+                        'logout_date' => '1000-10-10 10:00:00');
         $result = $wpdb->update($login_activity_table, $data, $where);
         if ($result === FALSE)
         {
             $aio_wp_security->debug_logger->log_debug("Error inserting record into ".$login_activity_table,4);//Log the highly unlikely event of DB error
         }
     }
+
     /**
-     * This will clean up the "users_online" transient entry for the current user. 
-     *
+     * Update the 'users_online' transient
+     * @return void
      */
-    function update_user_online_transient($user_id, $ip_addr) 
+    function update_users_online_transient()
+    {
+        if(is_user_logged_in()){
+            $is_multi_site = AIOWPSecurity_Utility::is_multisite_install();
+            $current_user_ip = AIOWPSecurity_Utility_IP::get_user_ip_address();
+            // get the logged in users list from transients entry
+            $logged_in_users = ($is_multi_site ? get_site_transient('users_online') : get_transient('users_online'));
+            $current_user = wp_get_current_user();
+            $current_user = $current_user->ID;
+            $current_time = current_time('timestamp');
+            $current_user_info = array();
+
+            // Store last activity time and ip address in transient entry
+            if($is_multi_site) {
+                $current_blog_id = get_current_blog_id();
+                // For multi-sites also store blog_id
+                $current_user_info = array("user_id" => $current_user, "last_activity" => $current_time, "ip_address" => $current_user_ip, "blog_id" => $current_blog_id);
+            } else {
+                $current_user_info = array("user_id" => $current_user, "last_activity" => $current_time, "ip_address" => $current_user_ip, "blog_id" => false);
+            }
+
+            if(empty($logged_in_users))
+            {
+                // case when "users_online" transient has been deleted after expiry or is empty
+                $logged_in_users = array();
+                $logged_in_users[] = $current_user_info;
+                $is_multi_site ? set_site_transient('users_online', $logged_in_users, 30 * 60) : set_transient('users_online', $logged_in_users, 30 * 60);
+            }
+            else
+            {
+                $key = 0;
+                $update_existing = false;
+                $item_index = 0;
+                foreach ($logged_in_users as $value)
+                {
+                    $value_minus_activity = $value;
+                    unset($value_minus_activity['last_activity']);
+                    $current_user_minus_activity = $current_user_info;
+                    unset($current_user_minus_activity['last_activity']);
+                    // Check if current user we're looking at has an entry in the 'users_online' transient
+                    if(empty(array_diff($current_user_minus_activity, $value_minus_activity)))
+                    {
+                        if ($value['last_activity'] < ($current_time - (15 * 60)))
+                        {
+                            $update_existing = true;
+                            $item_index = $key;
+                            break;
+                        }else{
+                            return; // do nothing and just return
+                        }
+                    }
+                    $key++;
+                }
+
+                if($update_existing) {
+                    // Update transient if the last activity was over 15 min ago for this user
+                    $logged_in_users[$item_index] = $current_user_info;
+                    AIOWPSecurity_Utility::is_multisite_install() ? set_site_transient('users_online', $logged_in_users, 30 * 60) : set_transient('users_online', $logged_in_users, 30 * 60);
+                } else {
+                    $logged_in_users[] = $current_user_info;
+                    AIOWPSecurity_Utility::is_multisite_install() ? set_site_transient('users_online', $logged_in_users, 30 * 60) : set_transient('users_online', $logged_in_users, 30 * 60);
+                }
+            }
+        }
+    }
+
+    /**
+     * This will clean up the "users_online" transient entry for the current user when a logout occurs
+     * @return void
+     */
+    function cleanup_users_online_transient($user_id, $ip_addr)
     {
         global $aio_wp_security;
-        $logged_in_users = (AIOWPSecurity_Utility::is_multisite_install() ? get_site_transient('users_online') : get_transient('users_online'));
-        //$logged_in_users = get_transient('users_online');
-        if ($logged_in_users === false || $logged_in_users == NULL)
+        $is_multi_site = AIOWPSecurity_Utility::is_multisite_install();
+        if ($is_multi_site) {
+            $current_blog_id = get_current_blog_id();
+            $logged_in_users = AIOWPSecurity_User_Login::get_subsite_logged_in_users($current_blog_id);
+        } else {
+            $logged_in_users = get_transient('users_online');
+        }
+
+        if (empty($logged_in_users))
         {
             return;
         }
@@ -536,12 +616,16 @@ class AIOWPSecurity_User_Login
             }
             $j++;
         }
-        //Save the transient
-        AIOWPSecurity_Utility::is_multisite_install() ? set_site_transient('users_online', $logged_in_users, 30 * 60) : set_transient('users_online', $logged_in_users, 30 * 60);
-        //set_transient('users_online', $logged_in_users, 30 * 60); //Set transient with the data obtained above and also set the expiry to 30min
+
+        // Save the transient
+        if ($is_multi_site) {
+            set_site_transient('users_online', $logged_in_users, 30 * 60);
+        } else {
+            set_transient('users_online', $logged_in_users, 30 * 60);
+        }
         return;
     }
-    
+
     /**
      * The handler for the WP "login_message" filter
      * Adds custom messages to the other messages that appear above the login form.
@@ -553,7 +637,7 @@ class AIOWPSecurity_User_Login
      * @return string
      *
      */
-    function aiowps_login_message($message = '') 
+    function aiowps_login_message($message = '')
     {
         global $aio_wp_security;
         $msg = '';
@@ -604,4 +688,31 @@ class AIOWPSecurity_User_Login
         $unlock_request_form .= '<button type="submit" name="aiowps_unlock_request" id="aiowps_unlock_request" class="button">'.__('Request Unlock', 'all-in-one-wp-security-and-firewall').'</button></div></form>';
         return $unlock_request_form;
     }
+
+    /**
+     * Returns all logged in users for specific subsite of multisite installation
+     * Checks the aiowps transient 'users_online'
+     * @param type $blog_id
+     * @return array|bool
+     */
+    static function get_subsite_logged_in_users($blog_id=0) {
+        if(empty($blog_id)) return false;
+
+        $subsite_logged_in_users = array();
+        if (AIOWPSecurity_Utility::is_multisite_install()) {
+            // this contains all logged in users sitewide across subsites
+            $users_online = get_site_transient('users_online');
+            if(empty($users_online)) {
+                return array();
+            }
+            // Extract only logged in users for current subsite
+            foreach($users_online as $user) {
+                if (isset($user['blog_id']) && $user['blog_id'] == $blog_id) {
+                    $subsite_logged_in_users[] = $user;
+                }
+            }
+        }
+        return $subsite_logged_in_users;
+    }
+
 }

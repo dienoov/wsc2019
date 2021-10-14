@@ -202,9 +202,9 @@ class AIOWPSecurity_User_Login_Menu extends AIOWPSecurity_Admin_Menu
                         //success case
                         $result = 1;
                         $list = $payload[1];
-                        $banned_ip_data = implode(PHP_EOL, $list);
-                        $aio_wp_security->configs->set_value('aiowps_lockdown_allowed_ip_addresses',$banned_ip_data);
-                        $_POST['aiowps_lockdown_allowed_ip_addresses'] = ''; //Clear the post variable for the banned address list
+                        $allowed_ip_data = implode(PHP_EOL, $list);
+                        $aio_wp_security->configs->set_value('aiowps_lockdown_allowed_ip_addresses', $allowed_ip_data);
+                        $_POST['aiowps_lockdown_allowed_ip_addresses'] = ''; //Clear the post variable for the allowed address list
                     }
                     else{
                         $result = -1;
@@ -230,7 +230,7 @@ class AIOWPSecurity_User_Login_Menu extends AIOWPSecurity_Admin_Menu
         <h2><?php _e('Login Lockdown Configuration', 'all-in-one-wp-security-and-firewall')?></h2>
         <div class="aio_blue_box">
             <?php
-            $brute_force_login_feature_link = '<a href="admin.php?page='.AIOWPSEC_BRUTE_FORCE_MENU_SLUG.'&tab=tab2">Cookie-Based Brute Force Login Prevention</a>';
+            $brute_force_login_feature_link = '<a href="admin.php?page='.AIOWPSEC_BRUTE_FORCE_MENU_SLUG.'&tab=tab2">'.__('Cookie-Based Brute Force Login Prevention', 'all-in-one-wp-security-and-firewall').'</a>';
             echo '<p>'.__('One of the ways hackers try to compromise sites is via a ', 'all-in-one-wp-security-and-firewall').'<strong>'.__('Brute Force Login Attack', 'all-in-one-wp-security-and-firewall').'</strong>. '.__('This is where attackers use repeated login attempts until they guess the password.', 'all-in-one-wp-security-and-firewall').'
             <br />'.__('Apart from choosing strong passwords, monitoring and blocking IP addresses which are involved in repeated login failures in a short period of time is a very effective way to stop these types of attacks.', 'all-in-one-wp-security-and-firewall').
             '<p>'.sprintf( esc_html(__('You may also want to checkout our %s feature for another secure way to protect against these types of attacks.', 'all-in-one-wp-security-and-firewall')), $brute_force_login_feature_link).'</p>';
@@ -426,7 +426,7 @@ class AIOWPSecurity_User_Login_Menu extends AIOWPSecurity_Admin_Menu
             <!-- For plugins, we also need to ensure that the form posts back to our current page -->
             <input type="hidden" name="page" value="<?php echo esc_attr($_REQUEST['page']); ?>" />
             <?php
-            $failed_login_list->search_box('Search', 'search_failed_login');
+            $failed_login_list->search_box(__('Search', 'all-in-one-wp-security-and-firewall'), 'search_failed_login');
             if (isset($_REQUEST["tab"])) {
                 echo '<input type="hidden" name="tab" value="' . esc_attr($_REQUEST["tab"]) . '" />';
             }
@@ -564,7 +564,7 @@ class AIOWPSecurity_User_Login_Menu extends AIOWPSecurity_Admin_Menu
         <div class="aio_blue_box">
             <?php
             echo '<p>'.__('This tab displays the activity for accounts registered with your site that have logged in using the WordPress login form.', 'all-in-one-wp-security-and-firewall').'
-            <br />'.__('The information below can be handy if you need to do security investigations because it will show you the last 50 recent login events by username, IP address and time/date.', 'all-in-one-wp-security-and-firewall').'
+            <br />'.__('The information below can be handy if you need to do security investigations because it will show you the last 100 recent login events by username, IP address and time/date.', 'all-in-one-wp-security-and-firewall').'
             </p>';
             ?>
         </div>
@@ -580,7 +580,7 @@ class AIOWPSecurity_User_Login_Menu extends AIOWPSecurity_Admin_Menu
             <!-- For plugins, we also need to ensure that the form posts back to our current page -->
             <input type="hidden" name="page" value="<?php echo esc_attr($_REQUEST['page']); ?>" />
             <?php
-            $acct_activity_list->search_box('Search', 'search_login_activity');
+            $acct_activity_list->search_box(__('Search', 'all-in-one-wp-security-and-firewall'), 'search_login_activity');
             if (isset($_REQUEST["tab"])) {
                 echo '<input type="hidden" name="tab" value="' . esc_attr($_REQUEST["tab"]) . '" />';
             }
@@ -607,9 +607,9 @@ class AIOWPSecurity_User_Login_Menu extends AIOWPSecurity_Admin_Menu
     
     function render_tab5()
     {
+        global $aio_wp_security;
         $logged_in_users = (AIOWPSecurity_Utility::is_multisite_install() ? get_site_transient('users_online') : get_transient('users_online'));
         
-        global $aio_wp_security;
         include_once 'wp-security-list-logged-in-users.php'; //For rendering the AIOWPSecurity_List_Table
         $user_list = new AIOWPSecurity_List_Logged_In_Users();
         if(isset($_REQUEST['action'])) //Do row action tasks for list table form for login activity display

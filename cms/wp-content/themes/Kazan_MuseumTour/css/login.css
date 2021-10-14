@@ -1,0 +1,22 @@
+body {
+    background-image: url("../images/login.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+body::after {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    min-height: 100vh;
+    min-width: 100vw;
+    background-color: white;
+    z-index: -1;
+    opacity: .75;
+}
+
+h1 {
+    display: none;
+}
