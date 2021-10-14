@@ -211,6 +211,11 @@ h1, h2, h3, h4, h5, h6 {
     .card {
         flex-direction: column-reverse;
     }
+
+    .card img {
+        border-left: none;
+        border-bottom: 2px solid black;
+    }
 }
 
 .form .input {
@@ -249,8 +254,9 @@ form .input input[type=submit] {
     align-items: center;
 }
 
-#footer #social {
-    filter: grayscale(1);
+#footer #social li {
+    background-color: transparent;
+    color: black;
 }
 
 .selected {
@@ -302,6 +308,7 @@ form .input input[type=submit] {
     align-items: center;
     font-family: "Ogg", serif;
     transition: top .5s ease-out;
+    border: 2px solid black;
 }
 
 #loading.show {
