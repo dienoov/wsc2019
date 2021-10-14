@@ -9,7 +9,7 @@
 		<h2><?php the_title() ?></h2>
 	</div>
     <div class="content">
-        <p><?php the_content(); ?></p>
+        <?php the_content(); ?>
     </div>
 </div>
 

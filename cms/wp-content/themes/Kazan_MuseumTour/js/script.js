@@ -9,6 +9,9 @@ const onClickHref = (ev) => {
     if (href === '#')
         return;
 
+    const loading = document.getElementById('loading');
+    loading.classList.add('show');
+
     history.pushState({}, '', href);
 
     jQuery.get(href, handlePage);
@@ -19,15 +22,13 @@ const onPopState = () => {
 };
 
 const handlePage = (html) => {
-    const loading = document.getElementById('loading');
-    loading.classList.add('show');
-
     const parser = new DOMParser();
     const parsed = parser.parseFromString(html, 'text/html');
 
     const container = document.getElementById('container');
 
     setTimeout(() => {
+        const loading = document.getElementById('loading');
         document.title = parsed.querySelector('title').innerText;
         container.innerHTML = parsed.getElementById('container').innerHTML;
         loading.classList.remove('show');
