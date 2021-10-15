@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePersonalAccessTokensTable extends Migration
+class CreateSessionRatingsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,14 @@ class CreatePersonalAccessTokensTable extends Migration
      */
     public function up()
     {
-        Schema::create('personal_access_tokens', function (Blueprint $table) {
+        Schema::create('session_ratings', function (Blueprint $table) {
             $table->id();
-            $table->morphs('tokenable');
-            $table->string('name');
-            $table->string('token', 64)->unique();
-            $table->text('abilities')->nullable();
-            $table->timestamp('last_used_at')->nullable();
+            $table->integer('session_registration_id');
+            $table->enum('rating', [1, 2, 3, 4, 5]);
+            $table->text('comment');
             $table->timestamps();
+
+            $table->foreign('session_registration_id')->references('id')->on('session_registrations');
         });
     }
 
@@ -31,6 +31,6 @@ class CreatePersonalAccessTokensTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('personal_access_tokens');
+        Schema::dropIfExists('session_ratings');
     }
 }
