@@ -3,6 +3,7 @@
 namespace App\Http;
 
 use App\Http\Middleware\CheckOrganizerEvent;
+use App\Http\Middleware\CORS;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
@@ -65,5 +66,6 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'check.event' => CheckOrganizerEvent::class,
+        'cors' => CORS::class,
     ];
 }

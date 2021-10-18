@@ -12,4 +12,9 @@ class Attendee extends Model
     public $timestamps = false;
 
     protected $guarded = [];
+
+    public function registrations()
+    {
+        return $this->hasMany(Registration::class);
+    }
 }
