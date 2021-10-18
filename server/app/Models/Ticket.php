@@ -31,4 +31,23 @@ class Ticket extends Model
 
         return 'Available until ' . Carbon::parse($this->validity->date)->format('F j, Y');
     }
+
+    public function getAvailableAttribute()
+    {
+        if (!$this->validity)
+            return true;
+
+        if ($this->validity->type === 'date' && $this->validity->date < date('Y-m-d'))
+            return false;
+
+        if ($this->validity->type === 'amount' && $this->validity->amount <= $this->registrations->count())
+            return false;
+
+        return true;
+    }
+
+    public function registrations()
+    {
+        return $this->hasMany(Registration::class);
+    }
 }

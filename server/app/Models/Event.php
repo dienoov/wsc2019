@@ -27,4 +27,9 @@ class Event extends Model
     {
         return $this->hasMany(Channel::class);
     }
+
+    public function organizer()
+    {
+        return $this->belongsTo(Organizer::class);
+    }
 }

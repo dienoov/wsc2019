@@ -54,7 +54,7 @@
             <h2 class="h4">Sessions</h2>
             <div class="btn-toolbar mb-2 mb-md-0">
                 <div class="btn-group mr-2">
-                    <a href="sessions/create.html" class="btn btn-sm btn-outline-secondary">
+                    <a href="{{ route('sessions.create', $event->id) }}" class="btn btn-sm btn-outline-secondary">
                         Create new session
                     </a>
                 </div>
@@ -82,7 +82,7 @@
                                 {{ $session->start->format('H:i') }} - {{ $session->end->format('H:i') }}
                             </td>
                             <td>{{ $session->type }}</td>
-                            <td><a href="sessions/edit.html">{{ $session->title }}</a></td>
+                            <td><a href="{{ route('sessions.edit', [$event->id, $session->id]) }}">{{ $session->title }}</a></td>
                             <td class="text-nowrap">{{ $session->speaker }}</td>
                             <td class="text-nowrap">{{ $channel->name }} / {{ $room->name }}</td>
                         </tr>
