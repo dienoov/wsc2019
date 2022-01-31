@@ -2,11 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="da01c7c8-6b53-462b-bf4d-0b0f5296bf9f" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../server/app/Http/Middleware/CORS.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../.idea/2019.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/2019.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../server/app/Http/Kernel.php" beforeDir="false" afterPath="$PROJECT_DIR$/../server/app/Http/Kernel.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../server/routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/../server/routes/api.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,6 +25,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="nodejs_package_manager_path" value="npm" />
     <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
@@ -41,7 +38,7 @@
       <option name="presentableId" value="Default" />
       <updated>1599443723458</updated>
       <workItem from="1599443725057" duration="14086000" />
-      <workItem from="1634515777164" duration="982000" />
+      <workItem from="1634515777164" duration="1192000" />
     </task>
     <servers />
   </component>

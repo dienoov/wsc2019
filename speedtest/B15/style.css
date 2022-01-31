@@ -1,0 +1,123 @@
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+#timer {
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+.digit, .colon {
+    position: relative;
+    width: 100px;
+    height: 200px;
+    margin-right: 20px;
+    margin-left: 20px;
+}
+
+.digit > *, .colon > * {
+    width: 10px;
+    height: 10px;
+    background-color: red;
+    position: absolute;
+    border-radius: 10px;
+}
+
+.digit .line-1 {
+    top: 0;
+    left: 10px;
+    width: 80px;
+}
+
+.digit .line-2 {
+    top: 10px;
+    left: 0;
+    height: 80px;
+}
+
+.digit .line-3 {
+    top: 10px;
+    left: 90px;
+    height: 80px;
+}
+
+.digit .line-4 {
+    top: 90px;
+    left: 10px;
+    width: 80px;
+}
+
+.digit .line-5 {
+    top: 100px;
+    left: 0;
+    height: 80px;
+}
+
+.digit .line-6 {
+    top: 100px;
+    left: 90px;
+    height: 80px;
+}
+
+.digit .line-7 {
+    top: 180px;
+    left: 10px;
+    width: 80px;
+}
+
+.colon {
+    width: 10px;
+}
+
+.colon .dot-1 {
+    top: 80px;
+}
+
+.colon .dot-2 {
+    top: 110px;
+}
+
+.digit.zero .line-4,
+.digit.one .line-1, .digit.one .line-2, .digit.one .line-4, .digit.one .line-5, .digit.one .line-7,
+.digit.two .line-2, .digit.two .line-6,
+.digit.three .line-2, .digit.three .line-5,
+.digit.four .line-1, .digit.four .line-5, .digit.four .line-7,
+.digit.five .line-3, .digit.five .line-5,
+.digit.six .line-3,
+.digit.seven .line-2, .digit.seven .line-4, .digit.seven .line-5, .digit.seven .line-7,
+.digit.nine .line-5 {
+    opacity: .25;
+}
+
+#tools {
+    display: flex;
+}
+
+#tools button {
+    display: block;
+    margin: 20px;
+    border: none;
+    font-size: 100%;
+    padding: .375em .5em;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button.start {
+    background-color: dodgerblue;
+    color: white;
+}
+
+button.stop {
+    background-color: orangered;
+    color: white;
+}
+
+button.reset {
+    background-color: orange;
+}
